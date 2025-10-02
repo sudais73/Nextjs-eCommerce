@@ -2,8 +2,9 @@
 
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
+import StripeElement from "@/components/StripeElement";
 import { useSearchParams } from "next/navigation";
-import StripeElement from "../components/StripeElement";
+import { Suspense } from "react";
 
 if (!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY) {
   throw new Error("NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY is not defined");
@@ -11,7 +12,7 @@ if (!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY) {
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
 
-export default function CheckoutPage() {
+function CheckoutContent() {
   const searchParams = useSearchParams();
   const clientSecret = searchParams.get("clientSecret");
   const orderId = searchParams.get("orderId");
@@ -19,9 +20,7 @@ export default function CheckoutPage() {
   if (!clientSecret) {
     return (
       <div className="w-full flex items-center justify-center h-[70vh]">
-        <p className="text-gray-600 text-lg">
-          Invalid checkout session. Please try again.
-        </p>
+        <p className="text-gray-600 text-lg">Invalid checkout session. Please try again.</p>
       </div>
     );
   }
@@ -30,8 +29,16 @@ export default function CheckoutPage() {
     <div className="w-[90%] md:w-[60%] mx-auto py-10">
       <h1 className="text-3xl font-extrabold text-center mb-8">Checkout</h1>
       <Elements stripe={stripePromise} options={{ clientSecret }}>
-        <StripeElement />
+        <StripeElement orderId={orderId} />
       </Elements>
     </div>
+  );
+}
+
+export default function CheckoutPage() {
+  return (
+    <Suspense fallback={<div className="p-10 text-center">Loading checkout...</div>}>
+      <CheckoutContent />
+    </Suspense>
   );
 }
