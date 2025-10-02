@@ -1,8 +1,9 @@
-'use client'
+'use client';
+
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
-import StripeElement from "../StripeElement/page";
 import { useSearchParams } from "next/navigation";
+import StripeElement from "../components/StripeElement";
 
 if (!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY) {
   throw new Error("NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY is not defined");
@@ -10,14 +11,17 @@ if (!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY) {
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
 
-const CheckoutPage = () => {
+export default function CheckoutPage() {
   const searchParams = useSearchParams();
   const clientSecret = searchParams.get("clientSecret");
+  const orderId = searchParams.get("orderId");
 
   if (!clientSecret) {
     return (
       <div className="w-full flex items-center justify-center h-[70vh]">
-        <p className="text-gray-600 text-lg">Invalid checkout session. Please try again.</p>
+        <p className="text-gray-600 text-lg">
+          Invalid checkout session. Please try again.
+        </p>
       </div>
     );
   }
@@ -30,6 +34,4 @@ const CheckoutPage = () => {
       </Elements>
     </div>
   );
-};
-
-export default CheckoutPage;
+}

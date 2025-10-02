@@ -1,12 +1,12 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useSearchParams } from 'next/navigation';
 import {
   useStripe,
   useElements,
   PaymentElement,
 } from "@stripe/react-stripe-js";
+import { useSearchParams } from 'next/navigation';
 
 const StripeElement = () => {
   const stripe = useStripe();
@@ -25,6 +25,7 @@ const StripeElement = () => {
       setLoading(true);
       if (!stripe || !elements) return;
 
+      // Validate inputs
       const { error: submitError } = await elements.submit();
       if (submitError) {
         setErrorMessage(submitError.message || "Something went wrong");
@@ -32,9 +33,10 @@ const StripeElement = () => {
         return;
       }
 
+      // Confirm payment
       const { error } = await stripe.confirmPayment({
         elements,
-        clientSecret: clientSecret ,
+        clientSecret,
         confirmParams: {
           return_url: `${process.env.NEXT_PUBLIC_BASE_URL}/success?orderId=${orderId}`,
         },
@@ -58,11 +60,11 @@ const StripeElement = () => {
           {clientSecret ? (
             <PaymentElement />
           ) : (
-            <div className='w-full bg-gray-200 h-10 animate-pulse'></div>
+            <div className="w-full bg-gray-200 h-10 animate-pulse"></div>
           )}
-          
+
           {errorMessage && (
-            <div className='text-xs text-red-600'>{errorMessage}</div>
+            <div className="text-xs text-red-600">{errorMessage}</div>
           )}
 
           <button
