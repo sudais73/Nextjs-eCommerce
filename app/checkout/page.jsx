@@ -2,9 +2,9 @@
 
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
-import StripeElement from "@/components/StripeElement";
 import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
+import StripeElement from "../components/StripeElement";
 
 if (!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY) {
   throw new Error("NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY is not defined");

@@ -69,8 +69,7 @@ const handleCheckout = async () => {
       <div className="flex items-center justify-between mb-10 border-b border-gray-200 pb-6">
         <h1 className="text-2xl md:text-3xl font-bold text-gray-800">
           Your <span className="text-orange-600">Cart</span>
-          <p>
-          {cartItems.length===0?"Is Empty":""}</p>
+          <p>{Object.keys(cartItems).length === 0 ? "Is Empty" : ""}</p>
         </h1>
         <p className="text-lg md:text-xl text-gray-500">{getCartCount()} items</p>
       </div>

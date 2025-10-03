@@ -63,7 +63,7 @@ const CartItem = ({ item }) => {
           </button>
         </div>
         <button
-          onClick={() => updateCartQuantity(product._id, 0)}
+          onClick={() => updateCartQuantity(item._id, 0)}
           className='hidden md:flex text-red-600 hover:text-red-800 transition-colors'
         >
           Remove
