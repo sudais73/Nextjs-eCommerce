@@ -7,7 +7,7 @@ import toast from "react-hot-toast";
 import { ProductContext } from "@/app/context/shopContext";
 import RelatedProduct from "@/app/components/RelatedProduct";
 import { useCart } from "@/app/context/cartContext";
-import { AuthContext, useAuth } from "@/app/context/AuthContext"; // ✅ import AuthContext
+import { useAuth } from "@/app/context/AuthContext"; 
 import { useRouter } from "next/navigation"; // ✅ import router
 
 const ProductDetailPage = ({ params }) => {
@@ -46,7 +46,7 @@ fetchUser()
   const handleAddToCart = () => {
     if (!currentUser) {
       toast.error("Please log in to add items to your cart.");
-      router.push("/login"); // redirect
+      router.push("/auth"); // redirect
       return;
     }
     addToCart(product._id);
