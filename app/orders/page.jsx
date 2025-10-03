@@ -6,6 +6,9 @@ import { FaBoxOpen, FaSpinner } from "react-icons/fa";
 import Link from "next/link";
 import { useAuth } from "../context/AuthContext";
 import Image from "next/image";
+import { loadStripe } from "@stripe/stripe-js";
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
+
 
 const OrdersPage = () => {
   const { currentUser } = useAuth();
@@ -32,21 +35,21 @@ const OrdersPage = () => {
     fetchOrders();
   }, [currentUser]);
 
-  // Start payment
-  const startPayment = async (orderId, isPaid) => {
-    if (isPaid) return; // stop if already paid ✅
-
+   const handleCheckout = async (orderId, isPaid) => {
     try {
-      const res = await axios.post("/api/payment-intent", { orderId });
-      const { clientSecret } = res.data;
-      if (!clientSecret) throw new Error("No client secret returned");
+      const stripe = await stripePromise;
+      const { data } = await axios.post('/api/pay-now', {orderId });
 
-      window.location.href = `/checkout?orderId=${orderId}&clientSecret=${clientSecret}`;
+      if (data.success) {
+        await stripe.redirectToCheckout({ sessionId: data.id });
+      } else {
+        toast.error(data.msg);
+      }
     } catch (error) {
-      console.error("Error starting payment:", error);
-      alert("Something went wrong, please try again.");
+      toast.error(error?.response?.data?.msg || error.message);
     }
   };
+
 
   // If not logged in
   if (!currentUser) {
@@ -170,7 +173,7 @@ const OrdersPage = () => {
                 </p>
 
                 <button
-                  onClick={() => startPayment(order._id, order.isPaid)}
+                  onClick={() => handleCheckout(order._id, order.isPaid)}
                   disabled={order.isPaid}
                   className={`px-5 py-2 rounded-lg font-semibold transition ${order.isPaid
                       ? "bg-green-600 text-white cursor-not-allowed opacity-80"

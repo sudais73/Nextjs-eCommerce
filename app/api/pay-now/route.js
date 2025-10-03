@@ -18,14 +18,29 @@ export async function POST(request) {
     const order = await Order.findById(orderId);
     if (!order) throw new Error("Order not found");
 
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount: Math.round(order.total * 100), // convert dollars to cents
+    const origin = request.headers.get("origin"); 
+   const session = await stripe.checkout.sessions.create({
+  payment_method_types: ["card"],
+  mode: "payment",
+  line_items: order.items.map((item) => ({
+    price_data: {
       currency: "usd",
-      automatic_payment_methods: { enabled: true },
-      metadata: { orderId: order._id.toString() },
-    });
+      product_data: { name: item.name },
+      unit_amount: item.price * 100, // Stripe expects amount in cents
+    },
+    quantity: item.quantity, // ✅ required for each item
+  })),
+  success_url: `${origin}/success?sessionId={CHECKOUT_SESSION_ID}&orderId=${orderId}`,
 
-    return NextResponse.json({ clientSecret: paymentIntent.client_secret });
+  cancel_url: `${origin}/order?status=cancelled`,
+  metadata: {
+    orderID: orderId,
+  },
+});
+
+
+
+     return NextResponse.json({ success: true, id: session.id });
   } catch (error) {
     console.error("Payment Intent Error:", error.message);
     return NextResponse.json({ msg: error.message }, { status: 500 });

@@ -6,13 +6,20 @@ import axios from "axios";
 
 const SuccessPage = () => {
   const searchParams = useSearchParams();
-  const paymentIntentId = searchParams.get("payment_intent");
   const orderId = searchParams.get("orderId"); 
   const [loading, setLoading] = useState(true);
   const [successMessage, setSuccessMessage] = useState("");
 
   useEffect(() => {
     if (!orderId) return;
+
+    const sessionId = searchParams.get("sessionId");
+    if (!sessionId) {
+      alert("No payment session found");
+      router.push("/");
+      return;
+    }
+
 
     const verifyPayment = async () => {
       try {
@@ -42,11 +49,7 @@ const SuccessPage = () => {
         </h1>
         <p className="mb-2">{loading ? "Please wait..." : successMessage}</p>
 
-        {paymentIntentId && (
-          <p className="text-sm text-gray-500">
-            Payment Intent ID: <code>{paymentIntentId}</code>
-          </p>
-        )}
+        
 
         <a
           href="/orders"
