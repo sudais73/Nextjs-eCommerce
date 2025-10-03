@@ -1,45 +1,44 @@
-'use client';
+// app/success/SuccessPage.jsx
+"use client";
 
 import { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import axios from "axios";
 
-const SuccessPage = () => {
+export default function SuccessPage() {
   const searchParams = useSearchParams();
-  const orderId = searchParams.get("orderId"); 
+  const orderId = searchParams.get("orderId");
+  const sessionId = searchParams.get("sessionId");
+  const router = useRouter();
+
   const [loading, setLoading] = useState(true);
   const [successMessage, setSuccessMessage] = useState("");
 
   useEffect(() => {
-    if (!orderId) return;
-
-    const sessionId = searchParams.get("sessionId");
-    if (!sessionId) {
-      alert("No payment session found");
+    if (!orderId || !sessionId) {
       router.push("/");
       return;
     }
-
 
     const verifyPayment = async () => {
       try {
         const res = await axios.post("/api/orders/verify-payment", { orderId });
 
         if (res.data.success) {
-          setSuccessMessage("Payment verified successfully! Your order is now paid.");
+          setSuccessMessage("✅ Payment verified successfully! Your order is now paid.");
         } else {
-          setSuccessMessage("Payment verification failed: " + res.data.message);
+          setSuccessMessage("❌ Payment verification failed: " + res.data.message);
         }
       } catch (err) {
         console.error("Verification error:", err);
-        setSuccessMessage("Error verifying payment.");
+        setSuccessMessage("⚠️ Error verifying payment.");
       } finally {
         setLoading(false);
       }
     };
 
     verifyPayment();
-  }, [orderId]);
+  }, [orderId, sessionId, router]);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-6">
@@ -48,8 +47,6 @@ const SuccessPage = () => {
           {loading ? "Verifying Payment..." : "Payment Status"}
         </h1>
         <p className="mb-2">{loading ? "Please wait..." : successMessage}</p>
-
-        
 
         <a
           href="/orders"
@@ -60,6 +57,4 @@ const SuccessPage = () => {
       </div>
     </div>
   );
-};
-
-export default SuccessPage;
+}
