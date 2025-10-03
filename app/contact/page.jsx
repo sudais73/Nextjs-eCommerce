@@ -1,9 +1,9 @@
 'use client'; 
 
-import React from 'react';
+import React, { useState } from 'react';
 
 const ContactUsPage = () => {
- 
+ const[isSubmitting, setIsSubmitting] = useState(false)
 
   return (
     <section className='w-[90%] md:w-[80%] mx-auto py-12'>
@@ -60,7 +60,7 @@ const ContactUsPage = () => {
             </div>
             <button
               type='submit'
-              disabled={isSubmitting}
+    
               className='w-full px-6 py-3 bg-blue-600 text-white font-bold rounded-lg shadow-md hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed'
             >
               {isSubmitting ? 'Sending...' : 'Send Message'}
